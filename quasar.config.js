@@ -4,6 +4,8 @@
 import { defineConfig } from '#q-app'
 
 export default defineConfig((/* ctx */) => {
+  const isGitHubPages = process.env.GITHUB_PAGES === 'true'
+
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -40,10 +42,10 @@ export default defineConfig((/* ctx */) => {
       // https://v2.quasar.dev/quasar-cli-vite/page-routing-with-vue-router#filename-based-routing
       // filenameBasedRouting: true,
 
-      vueRouterMode: 'history', // available values: 'hash', 'history'
-      // vueRouterBase,
+      vueRouterMode: isGitHubPages ? 'hash' : 'history',
+      vueRouterBase: isGitHubPages ? '/CINEFILE/' : '/',
 
-      // publicPath: '/',
+      publicPath: isGitHubPages ? '/CINEFILE/' : '/',
       // define: {},
       // defineEnv: {}
       // ignorePublicFolder: true,

@@ -46,8 +46,10 @@ npm run build
 ## GitHub Actions
 
 The CI workflow runs lint checks and a production build on pushes and pull
-requests targeting `main`. It can also be started manually from the Actions
-tab. This workflow validates the app but does not deploy it.
+requests targeting `main`. The deployment workflow builds the Quasar SPA and
+publishes `dist/spa` to GitHub Pages on pushes to `main`.
 
-Deployment is not configured yet; this can be done after the project is
-published to GitHub.
+To enable deployment, open the repository's **Settings → Pages** and set
+**Build and deployment → Source** to **GitHub Actions**. The Pages build uses
+the `/CINEFILE/` base path and hash-based routes; local builds keep the normal
+root path and history-based routes.
