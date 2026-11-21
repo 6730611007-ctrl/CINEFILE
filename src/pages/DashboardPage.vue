@@ -6,29 +6,29 @@
 
     <template v-else>
       <section
-        class="featured-hero"
-        @mouseenter="heroPaused = true"
-        @mouseleave="heroPaused = false"
-        @focusin="heroPaused = true"
-        @focusout="resumeHero"
+        class="featured-section"
+        @mouseenter="featuredSlidePaused = true"
+        @mouseleave="featuredSlidePaused = false"
+        @focusin="featuredSlidePaused = true"
+        @focusout="resumeFeaturedSlide"
       >
         <Transition name="backdrop-fade">
           <div
             :key="featuredMovie?.id || 'empty-backdrop'"
-            class="hero-backdrop"
-            :style="heroStyle"
+            class="featured-backdrop"
+            :style="featuredBackdropStyle"
           />
         </Transition>
-        <div class="hero-shade" />
+        <div class="featured-overlay" />
 
-        <div class="hero-content">
-          <div class="hero-kicker">
+        <div class="featured-content">
+          <div class="featured-label">
             <q-icon name="local_movies" />
             <span>{{ featuredMovie ? 'แนะนำจากคอลเลกชันของคุณ' : 'CINEFILE ORIGINAL' }}</span>
           </div>
           <h1>{{ featuredMovie?.title || 'เรื่องโปรดของคุณ รออยู่ที่นี่' }}</h1>
-          <div v-if="featuredMovie" class="hero-meta">
-            <span class="hero-rating"><q-icon name="star" /> {{ ratingLabel }}</span>
+          <div v-if="featuredMovie" class="featured-meta">
+            <span class="featured-rating"><q-icon name="star" /> {{ ratingLabel }}</span>
             <span>{{ featuredMovie.year || 'ไม่ระบุปี' }}</span>
           </div>
           <p>
@@ -37,7 +37,7 @@
               (isAdmin ? 'เพิ่มหนังที่น่าสนใจเพื่อให้ทุกคนเลือกชมได้' : 'เลือกชมหนังที่น่าสนใจจากรายการหนังของเรา')
             }}
           </p>
-          <div class="hero-actions">
+          <div class="featured-actions">
             <q-btn
               v-if="isAdmin"
               unelevated
@@ -63,7 +63,7 @@
 
         <template v-if="totalMovies > 1">
           <q-btn
-            class="hero-arrow hero-arrow-left"
+            class="featured-navigation featured-navigation--previous"
             round
             flat
             icon="chevron_left"
@@ -71,7 +71,7 @@
             @click="showPreviousMovie"
           />
           <q-btn
-            class="hero-arrow hero-arrow-right"
+            class="featured-navigation featured-navigation--next"
             round
             flat
             icon="chevron_right"
@@ -80,10 +80,10 @@
           />
         </template>
 
-        <div class="hero-index">
+        <div class="featured-index">
           <span>{{ String(activeSlideIndex + 1).padStart(2, '0') }}</span> /
           {{ String(totalMovies).padStart(2, '0') }}
-          <div v-if="totalMovies > 1" class="hero-pagination">
+          <div v-if="totalMovies > 1" class="featured-pagination">
             <button
               v-for="(_, index) in sortedMovies"
               :key="index"
@@ -147,14 +147,14 @@ const movies = useMovieStore()
 const isAdmin = computed(() => movies.isAdmin)
 const loading = computed(() => movies.loading)
 const currentSlide = ref(0)
-const heroPaused = ref(false)
+const featuredSlidePaused = ref(false)
 const sortedMovies = computed(() => [...movies.movies].sort((a, b) => Number(b.id) - Number(a.id)))
 const totalMovies = computed(() => movies.movies.length)
 const activeSlideIndex = computed(() =>
   totalMovies.value ? currentSlide.value % totalMovies.value : 0,
 )
 const featuredMovie = computed(() => sortedMovies.value[activeSlideIndex.value] || null)
-const heroStyle = computed(() =>
+const featuredBackdropStyle = computed(() =>
   featuredMovie.value?.poster ? { backgroundImage: `url("${featuredMovie.value.poster}")` } : {},
 )
 const featuredRoute = computed(() =>
@@ -184,7 +184,7 @@ let slideTimer
 onMounted(() => {
   load()
   slideTimer = window.setInterval(() => {
-    if (!heroPaused.value) showNextMovie()
+    if (!featuredSlidePaused.value) showNextMovie()
   }, 6000)
 })
 
@@ -212,8 +212,8 @@ function goToSlide(index) {
   currentSlide.value = index
 }
 
-function resumeHero(event) {
-  if (!event.currentTarget.contains(event.relatedTarget)) heroPaused.value = false
+function resumeFeaturedSlide(event) {
+  if (!event.currentTarget.contains(event.relatedTarget)) featuredSlidePaused.value = false
 }
 </script>
 
@@ -224,7 +224,7 @@ function resumeHero(event) {
   background: #101010;
 }
 
-.featured-hero {
+.featured-section {
   position: relative;
   display: flex;
   min-height: clamp(460px, 72vh, 760px);
@@ -238,13 +238,13 @@ function resumeHero(event) {
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.35);
 }
 
-.hero-backdrop,
-.hero-shade {
+.featured-backdrop,
+.featured-overlay {
   position: absolute;
   inset: 0;
 }
 
-.hero-backdrop {
+.featured-backdrop {
   background-position: center 38%;
   background-size: cover;
   opacity: 0.82;
@@ -261,7 +261,7 @@ function resumeHero(event) {
   opacity: 0;
 }
 
-.hero-shade {
+.featured-overlay {
   background:
     linear-gradient(
       90deg,
@@ -272,14 +272,14 @@ function resumeHero(event) {
     linear-gradient(0deg, #101010 0%, rgba(16, 16, 16, 0.82) 12%, rgba(16, 16, 16, 0.12) 62%);
 }
 
-.hero-content {
+.featured-content {
   position: relative;
   z-index: 1;
   width: min(660px, 75%);
   padding: 2rem clamp(1.5rem, 5.2vw, 5.5rem) clamp(4.5rem, 9vh, 7rem);
 }
 
-.hero-kicker {
+.featured-label {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -289,7 +289,7 @@ function resumeHero(event) {
   letter-spacing: 0.09em;
 }
 
-.hero-kicker .q-icon {
+.featured-label .q-icon {
   font-size: 1rem;
 }
 
@@ -303,7 +303,7 @@ h1 {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
 }
 
-.hero-meta {
+.featured-meta {
   display: flex;
   align-items: center;
   gap: 0.8rem;
@@ -312,14 +312,14 @@ h1 {
   font-weight: 700;
 }
 
-.hero-rating {
+.featured-rating {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   color: #8bd19c;
 }
 
-.hero-content p {
+.featured-content p {
   display: -webkit-box;
   overflow: hidden;
   max-width: 550px;
@@ -331,13 +331,13 @@ h1 {
   -webkit-line-clamp: 2;
 }
 
-.hero-actions {
+.featured-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem;
 }
 
-.hero-actions :deep(.q-btn) {
+.featured-actions :deep(.q-btn) {
   min-height: 36px;
   padding: 0 1rem;
   border-radius: 22px;
@@ -345,7 +345,7 @@ h1 {
   font-weight: 700;
 }
 
-.hero-index {
+.featured-index {
   position: absolute;
   z-index: 2;
   right: clamp(1.5rem, 5.2vw, 5.5rem);
@@ -354,19 +354,19 @@ h1 {
   font-size: 0.72rem;
 }
 
-.hero-index span {
+.featured-index span {
   color: white;
   font-weight: 700;
 }
 
-.hero-pagination {
+.featured-pagination {
   display: flex;
   justify-content: flex-end;
   gap: 0.3rem;
   margin-top: 0.5rem;
 }
 
-.hero-pagination button {
+.featured-pagination button {
   width: 1.3rem;
   height: 3px;
   padding: 0;
@@ -379,17 +379,17 @@ h1 {
     background-color 180ms ease;
 }
 
-.hero-pagination button.active {
+.featured-pagination button.active {
   width: 2.2rem;
   background: #f04444;
 }
 
-.hero-pagination button:focus-visible {
+.featured-pagination button:focus-visible {
   outline: 2px solid white;
   outline-offset: 3px;
 }
 
-.hero-arrow {
+.featured-navigation {
   position: absolute;
   z-index: 2;
   top: 50%;
@@ -398,15 +398,15 @@ h1 {
   transform: translateY(-50%);
 }
 
-.hero-arrow:hover {
+.featured-navigation:hover {
   background: rgba(15, 15, 15, 0.85);
 }
 
-.hero-arrow-left {
+.featured-navigation--previous {
   left: 0.75rem;
 }
 
-.hero-arrow-right {
+.featured-navigation--next {
   right: 0.75rem;
 }
 
@@ -456,11 +456,11 @@ h1 {
 }
 
 @media (max-width: 700px) {
-  .featured-hero {
+  .featured-section {
     min-height: clamp(480px, 72vh, 620px);
   }
 
-  .hero-content {
+  .featured-content {
     width: 100%;
     padding: 1.4rem 1.25rem 5.25rem;
   }
@@ -469,27 +469,27 @@ h1 {
     font-size: clamp(2.2rem, 11vw, 3.5rem);
   }
 
-  .hero-shade {
+  .featured-overlay {
     background:
       linear-gradient(90deg, rgba(10, 10, 12, 0.78), rgba(10, 10, 12, 0.18)),
       linear-gradient(0deg, #101010 0%, rgba(16, 16, 16, 0.78) 18%, rgba(16, 16, 16, 0.08) 100%);
   }
 
-  .hero-index {
+  .featured-index {
     right: 1.25rem;
     bottom: 1rem;
   }
 
-  .hero-arrow-left {
+  .featured-navigation--previous {
     right: 3.5rem;
     left: auto;
   }
 
-  .hero-arrow-right {
+  .featured-navigation--next {
     right: 0.5rem;
   }
 
-  .hero-arrow {
+  .featured-navigation {
     top: 1rem;
     transform: none;
   }
