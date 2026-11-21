@@ -1,4 +1,5 @@
 import { defineRouter } from '#q-app'
+import { Notify } from 'quasar'
 import {
   createMemoryHistory,
   createRouter,
@@ -7,6 +8,8 @@ import {
 } from 'vue-router'
 
 import routes from './routes.js'
+import { useAuthStore } from '@/stores/auth-store.js'
+import { pinia } from '@/stores/pinia.js'
 
 /*
  * If not building with SSR mode, you can
@@ -24,7 +27,7 @@ export default defineRouter((/* { store, ssrContext } */) => {
       ? createWebHistory
       : createWebHashHistory
 
-  const Router = createRouter({
+  const router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
 
@@ -34,5 +37,38 @@ export default defineRouter((/* { store, ssrContext } */) => {
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
   })
 
-  return Router
+  router.beforeEach(async (to) => {
+    const auth = useAuthStore(pinia)
+
+    if (!auth.initialized) {
+      try {
+        await auth.initialize()
+      } catch {
+        Notify.create({ type: 'negative', message: 'เชื่อมต่อระบบบัญชีไม่ได้ กรุณาลองอีกครั้ง' })
+        if (to.meta.requiresAuth) return false
+      }
+    }
+
+    if (to.meta.requiresAuth && !auth.isAuthenticated) {
+      return {
+        name: 'login',
+        query: {
+          redirect: to.fullPath,
+          mode: to.meta.requiresAdmin ? 'login' : to.name === 'movie-create' ? 'register' : 'login',
+        },
+      }
+    }
+
+    if (to.meta.requiresAdmin && !auth.isAdmin) {
+      return { name: 'dashboard' }
+    }
+
+    if (to.meta.guestOnly && auth.isAuthenticated) {
+      return { name: 'dashboard' }
+    }
+
+    return true
+  })
+
+  return router
 })

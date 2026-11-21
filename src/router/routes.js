@@ -3,13 +3,44 @@ const routes = [
     path: '/',
     component: () => import('@/layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('@/pages/IndexPage.vue') },
-      { path: 'second', component: () => import('@/pages/SecondPage.vue') },
+      {
+        path: '',
+        name: 'dashboard',
+        component: () => import('@/pages/DashboardPage.vue'),
+      },
+      {
+        path: 'watchlist',
+        name: 'watchlist',
+        component: () => import('@/pages/WatchlistPage.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'movies/new',
+        name: 'movie-create',
+        component: () => import('@/pages/MovieFormPage.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'movies/:id/edit',
+        name: 'movie-edit',
+        component: () => import('@/pages/MovieFormPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'profile',
+        name: 'profile',
+        component: () => import('@/pages/ProfilePage.vue'),
+        meta: { requiresAuth: true },
+      },
     ],
   },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/pages/LoginPage.vue'),
+    meta: { guestOnly: true },
+  },
 
-  // Always leave this as last one,
-  // but you can also remove it
   {
     path: '/:catchAll(.*)*',
     component: () => import('@/pages/ErrorNotFound.vue'),

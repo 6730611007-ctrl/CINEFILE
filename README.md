@@ -1,38 +1,47 @@
-# Quasar App (watchlist)
+# CINEFILE Watchlist
 
-## Install the dependencies
+A Quasar movie watchlist with Pinia state management and MockAPI for demo data,
+login, and registration.
 
-```bash
-pnpm install
-# or: yarn/npm/bun install
-```
+## MockAPI setup
 
-### Start the app in development mode (HMR, error reporting, etc.)
+The app uses `https://6af9b8c46d8b86fb22d72f31.mockapi.io/api` by default.
+Create one resource named `item` in the MockAPI project with these fields:
 
-```bash
-quasar dev
-```
+- `type` (String): `user` or `movie`
+- `name`, `email`, `username`, `password`, `role` (String): account records
+- `userId`, `userName` (String): movie owner information
+- `title`, `genre`, `description`, `poster`, `trailerUrl` (String): movie data
+- `year`, `rating` (Number): movie data
 
-### Format & Lint the files
+The app loads records from `item` and filters by `type` in the browser. Account
+records can use `email` or `username` to sign in. Set the intended account's
+`role` to `admin` in MockAPI to show the admin-only controls. Registration always
+creates users with `role: "user"`.
 
-```bash
-pnpm run lint
-# or: yarn/npm/bun run lint
-```
-
-...or just check formatting & linting:
-
-```bash
-pnpm run lint:check
-# or: yarn/npm/bun run lint:check
-```
-
-### Build the app for production
+Set `VITE_API_URL` in `.env` to use a different MockAPI base URL. Start the
+frontend with:
 
 ```bash
-quasar build
+npm install
+npm run dev
 ```
 
-### Customize the configuration
+## Important security limitation
 
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-file).
+This project intentionally uses MockAPI and does not run a custom backend.
+Passwords are stored as plain data in MockAPI, the browser creates a demo-only
+local token, and role/ownership checks run only in the frontend. A user can
+bypass those checks by calling the public MockAPI endpoint directly. Do not use
+real or reused passwords, and do not treat the admin-only UI as secure access
+control.
+
+## Validation
+
+```bash
+npm run lint:check
+npm run build
+```
+
+Deployment is not configured yet; this can be done after the project is
+published to GitHub.
