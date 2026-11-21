@@ -1,38 +1,57 @@
 <template>
-  <q-page class="page-width watchlist-page">
-    <div class="page-heading">
-      <div>
-        <h1>หนังทั้งหมด</h1>
-        <p>
-          {{ isAuthenticated ? 'ค้นหาได้ทุกเรื่อง และจัดการได้เฉพาะหนังที่คุณเพิ่ม' : 'ค้นหาและเลือกดูหนังที่น่าสนใจ' }}
+  <q-page class="page-width collection-page">
+    <section class="collection-heading">
+      <div class="heading-copy">
+        <div class="collection-kicker">
+          <q-icon name="local_movies" />
+          <span>CINEFILE COLLECTION</span>
+        </div>
+        <div class="heading-title">
+          <h1>หนังทั้งหมด</h1>
+          <div class="collection-count">
+            <q-icon name="movie_filter" />
+            {{ movies.movies.length }} เรื่อง
+          </div>
+        </div>
+        <p class="collection-subtitle">
+          {{ isAuthenticated ? 'ค้นหาและจัดการคอลเลกชันภาพยนตร์ของคุณ' : 'ค้นหาและเลือกดูหนังที่น่าสนใจ' }}
         </p>
       </div>
       <q-btn
         v-if="isAdmin"
+        class="add-movie-button"
         unelevated
-        color="primary"
         icon="add"
         label="เพิ่มหนัง"
         no-caps
         :to="{ name: 'movie-create' }"
       />
-    </div>
+    </section>
 
-    <div class="filters">
+    <div class="collection-tools">
       <q-input
         v-model="movies.filters.search"
         class="search-input"
         outlined
         dark
-        dense
+        color="negative"
         clearable
-        placeholder="ค้นหาชื่อหนัง แนว หรือเรื่องย่อ"
+        aria-label="ค้นหาหนังในคอลเลกชัน"
+        placeholder="ค้นหาชื่อหนัง แนว หรือเรื่องย่อ..."
       >
         <template #prepend><q-icon name="search" /></template>
       </q-input>
+      <div class="result-count" aria-live="polite">
+        <span>แสดง</span>
+        <strong>{{ filteredMovies.length }}</strong>
+        <span>จาก {{ movies.movies.length }} เรื่อง</span>
+      </div>
     </div>
 
-    <div v-if="loading" class="loading-state"><q-spinner size="36px" color="primary" /></div>
+    <div v-if="loading" class="loading-state">
+      <q-spinner size="36px" color="negative" />
+      <span>กำลังโหลดรายการหนัง...</span>
+    </div>
     <div v-else-if="filteredMovies.length" class="movie-grid">
       <MovieCard
         v-for="movie in filteredMovies"
@@ -42,7 +61,9 @@
       />
     </div>
     <div v-else class="empty-state">
-      <q-icon :name="movies.movies.length ? 'search_off' : 'movie_filter'" />
+      <div class="empty-icon">
+        <q-icon :name="movies.movies.length ? 'search_off' : 'movie_filter'" />
+      </div>
       <h2>{{ movies.movies.length ? 'ไม่พบหนังที่ตรงกับการค้นหา' : 'ยังไม่มีหนังในรายการ' }}</h2>
       <p>
         {{
@@ -54,9 +75,18 @@
         }}
       </p>
       <q-btn
-        v-if="!movies.movies.length && isAdmin"
+        v-if="movies.movies.length && movies.filters.search"
+        flat
+        color="negative"
+        label="ล้างคำค้นหา"
+        no-caps
+        @click="movies.filters.search = ''"
+      />
+      <q-btn
+        v-else-if="!movies.movies.length && isAdmin"
+        class="add-movie-button"
         unelevated
-        color="primary"
+        icon="add"
         label="เพิ่มหนัง"
         no-caps
         :to="{ name: 'movie-create' }"
@@ -107,68 +137,202 @@ async function removeMovie(movie) {
   margin: 0 auto;
 }
 
-.watchlist-page {
+.collection-page {
   min-height: 70vh;
-  padding-top: 1rem;
-  padding-bottom: 4rem;
+  padding-top: clamp(1.5rem, 3.5vw, 3rem);
+  padding-bottom: 5rem;
 }
 
-.page-heading {
+.collection-heading {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 92% 15%, rgba(255, 84, 75, 0.14), transparent 34%),
+    linear-gradient(120deg, rgba(31, 31, 37, 0.96), rgba(18, 19, 24, 0.96));
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.2);
+}
+
+.collection-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #ff7770;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.collection-kicker .q-icon {
+  font-size: 1rem;
+}
+
+.heading-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
 }
 
 h1 {
-  margin: 0.4rem 0;
-  font-size: clamp(2rem, 4vw, 2.8rem);
-  font-weight: 750;
-  letter-spacing: -0.04em;
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
 }
 
-.page-heading p,
-.empty-state p {
+.collection-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(255, 84, 75, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 84, 75, 0.09);
+  color: #ffc0bc;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.collection-count .q-icon {
+  color: #ff7770;
+  font-size: 0.95rem;
+}
+
+.collection-subtitle {
+  margin: 0.6rem 0 0;
   color: #a4a8b3;
+  font-size: 0.88rem;
 }
 
-.filters {
+.add-movie-button {
+  min-height: 44px;
+  flex: 0 0 auto;
+  padding: 0 1.15rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff625a, #d9343d);
+  color: #fff;
+  font-weight: 750;
+  box-shadow: 0 8px 20px rgba(217, 52, 61, 0.24);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.add-movie-button:hover {
+  box-shadow: 0 12px 26px rgba(217, 52, 61, 0.34);
+  transform: translateY(-2px);
+}
+
+.collection-tools {
   display: flex;
-  gap: 0.8rem;
-  margin: 2rem 0 1.3rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1.25rem;
 }
 
 .search-input {
-  flex: 1;
+  width: min(640px, 100%);
+}
+
+.search-input :deep(.q-field__control) {
+  min-height: 48px;
+  border-radius: 13px;
+  background: rgba(23, 25, 31, 0.78);
+}
+
+.search-input :deep(.q-field--outlined .q-field__control:before) {
+  border-color: rgba(255, 255, 255, 0.13);
+}
+
+.search-input :deep(.q-field--outlined .q-field__control:hover:before) {
+  border-color: rgba(255, 84, 75, 0.55);
+}
+
+.search-input :deep(.q-field--outlined.q-field--focused .q-field__control:after) {
+  border-color: #ff625a;
+}
+
+.search-input :deep(.q-field__prepend .q-icon) {
+  color: #ff7770;
+}
+
+.result-count {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.35rem;
+  color: #9296a0;
+  font-size: 0.78rem;
+}
+
+.result-count strong {
+  color: #f5f5f7;
+  font-size: 0.88rem;
 }
 
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr));
+  align-items: stretch;
+  gap: 1.15rem;
 }
 
 .loading-state,
 .empty-state {
   display: flex;
-  min-height: 280px;
+  min-height: 300px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.8rem;
-  border: 1px dashed rgba(255, 255, 255, 0.15);
-  border-radius: 18px;
+  gap: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 84, 75, 0.08), transparent 56%),
+    rgba(23, 25, 31, 0.58);
   text-align: center;
 }
 
-.empty-state > .q-icon {
-  color: #a897ff;
-  font-size: 2.5rem;
+.loading-state {
+  color: #a4a8b3;
+  font-size: 0.9rem;
+}
+
+.empty-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid rgba(255, 84, 75, 0.22);
+  border-radius: 50%;
+  background: rgba(255, 84, 75, 0.09);
+  color: #ff7770;
+}
+
+.empty-icon .q-icon {
+  font-size: 1.7rem;
 }
 
 .empty-state h2 {
   margin: 0;
   font-size: 1.2rem;
+}
+
+.empty-state p {
+  max-width: 420px;
+  margin: 0;
+  color: #a4a8b3;
+  font-size: 0.86rem;
+  line-height: 1.6;
 }
 
 @media (max-width: 950px) {
@@ -182,17 +346,47 @@ h1 {
     width: calc(100% - 28px);
   }
 
-  .watchlist-page {
-    padding-top: 2rem;
+  .collection-page {
+    padding-top: 1.25rem;
   }
 
-  .page-heading {
-    align-items: flex-start;
+  .collection-heading {
     flex-direction: column;
+    align-items: stretch;
+    gap: 1.1rem;
+    border-radius: 18px;
   }
 
-  .filters {
+  .add-movie-button {
+    align-self: flex-start;
+  }
+
+  .collection-tools {
+    align-items: stretch;
     flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .result-count {
+    justify-content: flex-end;
+  }
+
+  .movie-grid {
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .movie-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .collection-count {
+    font-size: 0.7rem;
   }
 }
 </style>
