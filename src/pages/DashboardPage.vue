@@ -21,47 +21,45 @@
         </Transition>
         <div class="hero-shade" />
 
-        <Transition name="content-fade" mode="out-in">
-          <div :key="featuredMovie?.id || 'empty-content'" class="hero-content">
-            <div class="hero-kicker">
-              <q-icon name="local_movies" />
-              <span>{{ featuredMovie ? 'แนะนำจากคอลเลกชันของคุณ' : 'CINEFILE ORIGINAL' }}</span>
-            </div>
-            <h1>{{ featuredMovie?.title || 'เรื่องโปรดของคุณ รออยู่ที่นี่' }}</h1>
-            <div v-if="featuredMovie" class="hero-meta">
-              <span class="hero-rating"><q-icon name="star" /> {{ ratingLabel }}</span>
-              <span>{{ featuredMovie.year || 'ไม่ระบุปี' }}</span>
-            </div>
-            <p>
-              {{
-                featuredMovie?.description ||
-                (isAdmin ? 'เพิ่มหนังที่น่าสนใจเพื่อให้ทุกคนเลือกชมได้' : 'เลือกชมหนังที่น่าสนใจจากรายการหนังของเรา')
-              }}
-            </p>
-            <div class="hero-actions">
-              <q-btn
-                v-if="isAdmin"
-                unelevated
-                color="white"
-                text-color="dark"
-                :icon="featuredMovie ? 'play_arrow' : 'add'"
-                :label="featuredMovie ? 'ดูหนังทั้งหมด' : 'เพิ่มหนังเรื่องแรก'"
-                no-caps
-                :to="featuredMovie ? { name: 'watchlist' } : featuredRoute"
-              />
-              <q-btn
-                v-if="isAdmin"
-                unelevated
-                color="grey-9"
-                text-color="white"
-                icon="info"
-                label="รายการหนัง"
-                no-caps
-                :to="{ name: 'watchlist' }"
-              />
-            </div>
+        <div class="hero-content">
+          <div class="hero-kicker">
+            <q-icon name="local_movies" />
+            <span>{{ featuredMovie ? 'แนะนำจากคอลเลกชันของคุณ' : 'CINEFILE ORIGINAL' }}</span>
           </div>
-        </Transition>
+          <h1>{{ featuredMovie?.title || 'เรื่องโปรดของคุณ รออยู่ที่นี่' }}</h1>
+          <div v-if="featuredMovie" class="hero-meta">
+            <span class="hero-rating"><q-icon name="star" /> {{ ratingLabel }}</span>
+            <span>{{ featuredMovie.year || 'ไม่ระบุปี' }}</span>
+          </div>
+          <p>
+            {{
+              featuredMovie?.description ||
+              (isAdmin ? 'เพิ่มหนังที่น่าสนใจเพื่อให้ทุกคนเลือกชมได้' : 'เลือกชมหนังที่น่าสนใจจากรายการหนังของเรา')
+            }}
+          </p>
+          <div class="hero-actions">
+            <q-btn
+              v-if="isAdmin"
+              unelevated
+              color="white"
+              text-color="dark"
+              :icon="featuredMovie ? 'play_arrow' : 'add'"
+              :label="featuredMovie ? 'ดูหนังทั้งหมด' : 'เพิ่มหนังเรื่องแรก'"
+              no-caps
+              :to="featuredMovie ? { name: 'watchlist' } : featuredRoute"
+            />
+            <q-btn
+              v-if="isAdmin"
+              unelevated
+              color="grey-9"
+              text-color="white"
+              icon="info"
+              label="รายการหนัง"
+              no-caps
+              :to="{ name: 'watchlist' }"
+            />
+          </div>
+        </div>
 
         <template v-if="totalMovies > 1">
           <q-btn
@@ -272,19 +270,6 @@ function resumeHero(event) {
       rgba(10, 10, 12, 0.12) 76%
     ),
     linear-gradient(0deg, #101010 0%, rgba(16, 16, 16, 0.82) 12%, rgba(16, 16, 16, 0.12) 62%);
-}
-
-.content-fade-enter-active,
-.content-fade-leave-active {
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-}
-
-.content-fade-enter-from,
-.content-fade-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
 }
 
 .hero-content {
