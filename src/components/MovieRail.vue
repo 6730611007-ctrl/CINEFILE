@@ -2,7 +2,7 @@
   <section v-if="movies.length" class="movie-rail">
     <div class="rail-heading">
       <div>
-        <div class="rail-kicker">คอลเลกชันของคุณ</div>
+        <div v-if="isAdmin" class="rail-kicker">คอลเลกชันของคุณ</div>
         <h2>{{ title }}</h2>
       </div>
       <div v-if="movies.length > 2" class="rail-controls">
