@@ -43,5 +43,11 @@ npm run lint:check
 npm run build
 ```
 
+## GitHub Actions
+
+The CI workflow runs lint checks and a production build on pushes and pull
+requests targeting `main`. It can also be started manually from the Actions
+tab. This workflow validates the app but does not deploy it.
+
 Deployment is not configured yet; this can be done after the project is
 published to GitHub.
