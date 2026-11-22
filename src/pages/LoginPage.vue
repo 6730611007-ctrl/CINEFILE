@@ -34,6 +34,25 @@
               <h2>ยินดีต้อนรับ</h2>
               <p class="auth-subtitle">เข้าสู่ระบบด้วยบัญชีที่กำหนดไว้</p>
 
+              <section class="demo-accounts" aria-label="บัญชีทดลอง">
+                <div class="demo-accounts-heading">
+                  <q-icon name="key" />
+                  <span>บัญชีทดลอง</span>
+                </div>
+                <div class="demo-account-list">
+                  <div class="demo-account">
+                    <div class="demo-role">ผู้ดูแลระบบ</div>
+                    <div><span>Username</span><code>admin</code></div>
+                    <div><span>Password</span><code>123456789</code></div>
+                  </div>
+                  <div class="demo-account">
+                    <div class="demo-role">ผู้ใช้ทั่วไป</div>
+                    <div><span>Username</span><code>user</code></div>
+                    <div><span>Password</span><code>123456789</code></div>
+                  </div>
+                </div>
+              </section>
+
               <q-form class="auth-form" @submit="submitLogin">
                 <q-input
                   v-model="loginForm.identifier"
@@ -254,6 +273,63 @@ async function redirectAfterAuth() {
   font-size: 0.9rem;
 }
 
+.demo-accounts {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.12), rgba(20, 20, 28, 0.72));
+}
+
+.demo-accounts-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+  color: #ff7777;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.demo-account-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.demo-account {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(8, 8, 14, 0.58);
+  color: #a4a8b3;
+  font-size: 0.72rem;
+}
+
+.demo-role {
+  margin-bottom: 0.1rem;
+  color: #f5f5f7;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.demo-account > div:not(.demo-role) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.2rem 0.35rem;
+}
+
+.demo-account code {
+  color: #fff;
+  font-family: inherit;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
 .auth-form {
   display: grid;
   gap: 0.3rem;
@@ -309,6 +385,19 @@ async function redirectAfterAuth() {
 
   .auth-panel {
     padding: 2rem 1.4rem;
+  }
+
+  .demo-accounts {
+    padding: 0.85rem;
+  }
+
+  .demo-account-list {
+    gap: 0.45rem;
+  }
+
+  .demo-account {
+    padding: 0.6rem;
+    font-size: 0.68rem;
   }
 
   .mobile-brand {
