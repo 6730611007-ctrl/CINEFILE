@@ -54,7 +54,6 @@ export default defineRouter((/* { store, ssrContext } */) => {
         name: 'login',
         query: {
           redirect: to.fullPath,
-          mode: to.meta.requiresAdmin ? 'login' : to.name === 'movie-create' ? 'register' : 'login',
         },
       }
     }

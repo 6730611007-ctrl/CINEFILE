@@ -64,26 +64,6 @@ export const useAuthStore = defineStore('auth', {
       return this.saveSession(user)
     },
 
-    async register({ name, email, password }) {
-      const normalizedEmail = email.trim().toLowerCase()
-      const { data: items } = await api.get('/item')
-      const users = items.filter((item) => item.type === 'user')
-
-      if (users.some((user) => user.email?.toLowerCase() === normalizedEmail)) {
-        throw new Error('อีเมลนี้ถูกใช้งานแล้ว')
-      }
-
-      const { data: user } = await api.post('/item', {
-        type: 'user',
-        name: name.trim(),
-        email: normalizedEmail,
-        password,
-        role: 'user',
-      })
-
-      return this.saveSession(user)
-    },
-
     logout() {
       this.user = null
       this.accessToken = null

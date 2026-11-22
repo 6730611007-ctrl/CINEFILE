@@ -1,7 +1,7 @@
 # CINEFILE Watchlist
 
-A Quasar movie watchlist with Pinia state management and MockAPI for demo data,
-login, and registration.
+A Quasar movie watchlist with Pinia state management and MockAPI for demo data
+and login.
 
 ## MockAPI setup
 
@@ -14,10 +14,11 @@ Create one resource named `item` in the MockAPI project with these fields:
 - `title`, `genre`, `description`, `poster`, `trailerUrl` (String): movie data
 - `year`, `rating` (Number): movie data
 
-The app loads records from `item` and filters by `type` in the browser. Account
-records can use `email` or `username` to sign in. Set the intended account's
-`role` to `admin` in MockAPI to show the admin-only controls. Registration always
-creates users with `role: "user"`.
+The app loads records from `item` and filters by `type` in the browser. Only
+account records preconfigured in MockAPI can sign in. Account records can use
+`email` or `username` to sign in. Set the intended account's `role` to `admin`
+in MockAPI to show the admin-only controls. The app does not provide public
+account registration.
 
 Set `VITE_API_URL` in `.env` to use a different MockAPI base URL. Start the
 frontend with:
