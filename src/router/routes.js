@@ -12,7 +12,6 @@ const routes = [
         path: 'watchlist',
         name: 'watchlist',
         component: () => import('@/pages/WatchlistPage.vue'),
-        meta: { requiresAuth: true, requiresAdmin: true },
       },
       {
         path: 'movies/new',

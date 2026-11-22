@@ -4,17 +4,17 @@
       <div class="heading-copy">
         <div class="collection-kicker">
           <q-icon name="local_movies" />
-          <span>CINEFILE COLLECTION</span>
+          <span>{{ isAdmin ? 'CINEFILE COLLECTION' : 'CINEFILE SEARCH' }}</span>
         </div>
         <div class="heading-title">
-          <h1>หนังทั้งหมด</h1>
-          <div class="collection-count">
+          <h1>{{ isAdmin ? 'หนังทั้งหมด' : 'ค้นหาหนัง' }}</h1>
+          <div v-if="isAdmin || searchTerm" class="collection-count">
             <q-icon name="movie_filter" />
-            {{ movies.movies.length }} เรื่อง
+            {{ isAdmin ? `${movies.movies.length} เรื่อง` : `พบ ${visibleMovies.length} เรื่อง` }}
           </div>
         </div>
         <p class="collection-subtitle">
-          {{ isAuthenticated ? 'ค้นหาและจัดการคอลเลกชันภาพยนตร์ของคุณ' : 'ค้นหาและเลือกดูหนังที่น่าสนใจ' }}
+          {{ isAdmin ? 'ค้นหาและจัดการคอลเลกชันภาพยนตร์ของคุณ' : 'ค้นหาจากชื่อหนัง แนวภาพยนตร์ หรือเรื่องย่อ' }}
         </p>
       </div>
       <q-btn
@@ -41,10 +41,10 @@
       >
         <template #prepend><q-icon name="search" /></template>
       </q-input>
-      <div class="result-count" aria-live="polite">
+      <div v-if="isAdmin || searchTerm" class="result-count" aria-live="polite">
         <span>แสดง</span>
-        <strong>{{ filteredMovies.length }}</strong>
-        <span>จาก {{ movies.movies.length }} เรื่อง</span>
+        <strong>{{ visibleMovies.length }}</strong>
+        <span>{{ isAdmin ? `จาก ${movies.movies.length} เรื่อง` : 'เรื่องที่พบ' }}</span>
       </div>
     </div>
 
@@ -52,9 +52,9 @@
       <q-spinner size="36px" color="negative" />
       <span>กำลังโหลดรายการหนัง...</span>
     </div>
-    <div v-else-if="filteredMovies.length" class="movie-grid">
+    <div v-else-if="visibleMovies.length" class="movie-grid">
       <MovieCard
-        v-for="movie in filteredMovies"
+        v-for="movie in visibleMovies"
         :key="movie.id"
         :movie="movie"
         @remove="removeMovie(movie)"
@@ -62,20 +62,32 @@
     </div>
     <div v-else class="empty-state">
       <div class="empty-icon">
-        <q-icon :name="movies.movies.length ? 'search_off' : 'movie_filter'" />
+        <q-icon :name="searchTerm ? 'search_off' : 'movie_filter'" />
       </div>
-      <h2>{{ movies.movies.length ? 'ไม่พบหนังที่ตรงกับการค้นหา' : 'ยังไม่มีหนังในรายการ' }}</h2>
+      <h2>
+        {{
+          !isAdmin && !searchTerm
+            ? 'ค้นหาหนังที่คุณสนใจ'
+            : searchTerm
+              ? isAdmin
+                ? 'ไม่พบหนังที่ตรงกับการค้นหา'
+                : 'ยังไม่มีหนังเรื่องนี้'
+              : 'ยังไม่มีหนังในรายการ'
+        }}
+      </h2>
       <p>
         {{
-          movies.movies.length
-            ? 'ลองเปลี่ยนคำค้นหาของคุณ'
-            : isAdmin
-              ? 'เพิ่มหนังเรื่องแรกเพื่อเริ่มต้นคอลเลกชันของคุณ'
-              : 'โปรดกลับมาตรวจสอบรายการหนังอีกครั้งภายหลัง'
+          !isAdmin && !searchTerm
+            ? 'พิมพ์ชื่อหนัง แนวภาพยนตร์ หรือคำจากเรื่องย่อในช่องค้นหา'
+            : searchTerm
+              ? 'ลองตรวจสอบคำค้นหาหรือค้นหาด้วยคำอื่น'
+              : isAdmin
+                ? 'เพิ่มหนังเรื่องแรกเพื่อเริ่มต้นคอลเลกชันของคุณ'
+                : 'โปรดกลับมาตรวจสอบรายการหนังอีกครั้งภายหลัง'
         }}
       </p>
       <q-btn
-        v-if="movies.movies.length && movies.filters.search"
+        v-if="searchTerm"
         flat
         color="negative"
         label="ล้างคำค้นหา"
@@ -99,17 +111,18 @@
 import { computed, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import MovieCard from '@/components/MovieCard.vue'
-import { useAuthStore } from '@/stores/auth-store.js'
 import { useMovieStore } from '@/stores/movie-store.js'
 import { getApiErrorMessage } from '@/utils/api-error.js'
 
 const $q = useQuasar()
-const auth = useAuthStore()
 const movies = useMovieStore()
-const isAuthenticated = computed(() => auth.isAuthenticated)
 const isAdmin = computed(() => movies.isAdmin)
 const loading = computed(() => movies.loading)
 const filteredMovies = computed(() => movies.filteredMovies)
+const searchTerm = computed(() => movies.filters.search.trim())
+const visibleMovies = computed(() =>
+  isAdmin.value || searchTerm.value ? filteredMovies.value : [],
+)
 
 onMounted(load)
 
