@@ -151,7 +151,7 @@ const fallbackPoster =
 .poster-wrap {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 0.78;
+  height: clamp(190px, 54vw, 220px);
   background: #101114;
 }
 
