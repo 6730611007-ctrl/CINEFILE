@@ -34,6 +34,7 @@
             class="header-search"
             outlined
             dark
+            color="negative"
             dense
             placeholder="ค้นหาชื่อหนัง..."
             aria-label="ค้นหาหนัง"
@@ -41,7 +42,8 @@
             @keyup.esc="closeSearch"
           >
             <template #append>
-              <q-btn flat round dense icon="search" aria-label="ปิดช่องค้นหา" @click="toggleSearch" />
+              <q-btn flat round dense icon="search" aria-label="ค้นหาหนัง" @click="submitSearch" />
+              <q-btn flat round dense icon="close" aria-label="ปิดช่องค้นหา" @click="closeSearch" />
             </template>
           </q-input>
         </transition>
