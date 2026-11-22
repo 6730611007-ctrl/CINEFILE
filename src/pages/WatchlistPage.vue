@@ -394,10 +394,6 @@ h1 {
 }
 
 @media (max-width: 390px) {
-  .movie-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .collection-count {
     font-size: 0.7rem;
   }
